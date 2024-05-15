@@ -62,7 +62,7 @@ def drilling_labyrinth(labyrinth, labyrinth_size):
         if drill_cords[0] + 2 < labyrinth_size:
             direction.append((1, 0))
 
-        if direction and randint(0, 100) != 1:
+        if direction and randint(0, 100) != 1: # TODO: ЧЕТНОСТЬ
             choice_direction = choice(direction)
             show(labyrinth)
             for _ in range(2):
