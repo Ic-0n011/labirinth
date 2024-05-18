@@ -17,13 +17,13 @@ from random import randint, choice
         заканчивает когда в четных нет стен
           все четные свободны | есть выход
 """
-labyrinth_size = 30
+labyrinth_size = randint(3, 47)
+if labyrinth_size % 2 == 0:
+    labyrinth_size += 1
 
 
 # Создаем лабиринт
 def create_labyrinth(labyrinth_size):
-    if labyrinth_size % 2 == 0:
-        labyrinth_size += 1
     labyrinth = []
     for n in range(labyrinth_size):
         labyrinth.append([])
@@ -44,47 +44,63 @@ def show(labyrinth):
         print(*cells)
 
 
-# делаем в нем проходы
-def drilling_labyrinth() -> None:
-    # создаем кординаты бура, делаем вход и выход
-    drill = [1, 1]
-    labyrinth[drill[0]][drill[1]] = 0
-    labyrinth[0][1] = 0
+class Drill():
+    def __init__(self, x=1, y=1) -> None:
+        self.y = y
+        self.x = x
 
-    labyrinth[labyrinth_size][labyrinth_size-1] = 0
-    crossroads = []
-    while True:
-        clean_passages = []
+    def drill(self) -> bool:
         # собираем доступные направления из кординат бура
-        if drill[0] + 2 < labyrinth_size:
-            if labyrinth[drill[0] + 2][drill[1]] == 1:
+        clean_passages = []
+        crossroads = None
+        if self.y + 2 < labyrinth_size:
+            if labyrinth[self.y + 2][self.x] == 1:
                 clean_passages.append((1, 0))
-        if drill[1] + 2 < labyrinth_size:
-            if labyrinth[drill[0]][drill[1] + 2]  == 1:
+        if self.x + 2 < labyrinth_size:
+            if labyrinth[self.y][self.x + 2] == 1:
                 clean_passages.append((0, 1))
-        if drill[0] - 2 > 0:
-            if labyrinth[drill[0] - 2][drill[1]] == 1:
+        if self.y - 2 > 0:
+            if labyrinth[self.y - 2][self.x] == 1:
                 clean_passages.append((-1, 0))
-        if drill[1] - 2 > 0:
-            if labyrinth[drill[0]][drill[1] - 2] == 1:
+        if self.x - 2 > 0:
+            if labyrinth[self.y][self.x - 2] == 1:
                 clean_passages.append((0, -1))
-        
-        # Перекресток - если направлений несколько, то сохраняем эту кординату
-        if clean_passages:
-            crossroads.append([drill[0], drill[1]])
-        
+
+        if len(clean_passages) > 1:
+            crossroads = (self.x, self.y)
+
         if clean_passages:  # если есть доступные направления, бурим
             direction = choice(clean_passages)
             for _ in range(2):
-                drill[0] += direction[0]
-                drill[1] += direction[1]
-                labyrinth[drill[0]][drill[1]] = 0
-        elif crossroads:  # иначе перемещаемся на прошлые перекрестки
-            drill = crossroads[-1]
-            crossroads.pop(-1)
-        else:  # если перекрестковне осталось то заканчиваем бурить
+                self.y += direction[0]
+                self.x += direction[1]
+                labyrinth[self.y][self.x] = 0
+        else:  # иначе удаляемся
+            return 'Del'
+        return crossroads
+
+
+# делаем в нем проходы
+def drilling_labyrinth() -> None:
+    # создаем бур, делаем вход и выход
+    drills = []
+    cord_fest_dril = randint()
+    if cord_fest_dril % 2 == 0:
+        cord_fest_dril += 1
+    drills.append(Drill(cord_fest_dril, cord_fest_dril))
+    labyrinth[drills[0].x][drills[0].y] = 0
+    labyrinth[0][1] = 0
+    labyrinth[labyrinth_size-1][labyrinth_size-2] = 0
+    while True:
+        # Перекресток - если направлений несколько, то сохраняем эту кординату
+        for drill in drills:
+            result = drill.drill()
+            if result == 'Del':
+                drills.remove(drill)
+            elif result:
+                drills.append(Drill(result[0], result[1]))
+        if not drills:  # если перекрестковне осталось то заканчиваем бурить
             break
-        
 
 
 labyrinth = create_labyrinth(labyrinth_size)
