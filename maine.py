@@ -84,7 +84,7 @@ class Drill():
 def drilling_labyrinth() -> None:
     # создаем бур, делаем вход и выход
     drills = []
-    cord_fest_dril = randint()
+    cord_fest_dril = randint(3, labyrinth_size-3)
     if cord_fest_dril % 2 == 0:
         cord_fest_dril += 1
     drills.append(Drill(cord_fest_dril, cord_fest_dril))
@@ -106,3 +106,5 @@ def drilling_labyrinth() -> None:
 labyrinth = create_labyrinth(labyrinth_size)
 drilling_labyrinth()
 show(labyrinth)
+
+# FIXME: бульдозер всегда ходит, но не всегда ломает стены
